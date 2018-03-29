@@ -32,16 +32,20 @@ exports.readFile = function(path, callback) {
     return callback(data);
   });
 }
-
+// archive.readFile(index, (data) => { res.end(data) })
 exports.readListOfUrls = function(callback) {
-  callback(paths.list);
+  exports.readFile(exports.paths.list, (data) => {
+    // console.log('hi Maxx, sup');
+    // console.log(data.toString().split('\n'));
+    callback(data.toString().split('\n'));
+  });
 };
 
-exports.isUrlInList = function(url, callback) { // returns boolean? for asynch?!
-  readListOfUrls((data) => {
+exports.isUrlInList = function(url, callback) { // boolean? in my async?
+  exports.readListOfUrls((data) => {
     callback(data);
-    return data.split('\n').includes(url); //asumes data is splittable
-  });
+    return data.split('\n').includes(url);
+  }); //asumes data is splittable
 };
 
 exports.addUrlToList = function(url, callback) {
