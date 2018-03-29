@@ -35,21 +35,28 @@ exports.readFile = function(path, callback) {
 // archive.readFile(index, (data) => { res.end(data) })
 exports.readListOfUrls = function(callback) {
   exports.readFile(exports.paths.list, (data) => {
-    // console.log('hi Maxx, sup');
-    // console.log(data.toString().split('\n'));
-    callback(data.toString().split('\n'));
+    let arr = data.toString().split('\n'); // crashes from here
+    arr = arr.slice(0, arr.length);
+    callback(arr);
   });
 };
 
 exports.isUrlInList = function(url, callback) { // boolean? in my async?
   exports.readListOfUrls((data) => {
-    callback(data);
-    return data.split('\n').includes(url);
+    callback(data.includes(url));
   }); //asumes data is splittable
 };
 
 exports.addUrlToList = function(url, callback) {
-  // !isUrlInList(url…)
+  if (!exports.isUrlInList(url,(data) => {return data})){
+    exports.readListOfUrls((urls) => {
+      urls.push(url);
+      // console.log(urls)
+      let urlsList = urls.join('/n');
+      // console.log(urlsList)
+      callback(fs.writeFile(exports.paths.list, urlsList));
+    })  
+  }
 };
 
 exports.isUrlArchived = function(url, callback) {
