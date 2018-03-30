@@ -9,17 +9,24 @@ exports.handleRequest = function (req, res) {
   if (req.method === "GET"){
     let url = req.url.slice(1);
     console.log(url);
-    
-    // if in archive
-    archive.isUrlArchived(url, (data) => {
-      console.log(data);
-      if (data) {
+    if (url){
+      archive.isUrlArchived(url, (data) => {
+        console.log(data);
+        if (data) {
+          console.log("200")
+          longUrl = archive.paths.archivedSites+'/'+url;
+          console.log(longUrl) 
+          httpHelpers.serveAssets(res, longUrl, (data) => { return data; });
+        } else {
+         // if not
+         console.log("404 should happen")
+          
+          httpHelpers.serveAssets(res, url, (data) => { return data; }, 404);
+        }
+      });
+    } else {
         httpHelpers.serveAssets(res, index, (data) => { return data; });
-      } else {
-       // if not
-        httpHelpers.serveAssets(res, index, (data) => { return data; }, 404);
-      }
-    });
+    }
     
     // archive.readListOfUrls((data) => {console.log(data)});
     // archive.readFile(index, (data) => {res.end(data)});

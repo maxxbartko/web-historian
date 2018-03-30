@@ -11,15 +11,16 @@ exports.headers = {
 };
 
 exports.serveAssets = function(res, asset, callback, code=200) {
-  res.writeHead(code, 'OK', exports.headers);
+  if (code === 404){
+    res.writeHead(404, 'File Not Found', exports.headers);
+    res.end(asset)   
+  } else {
+    res.writeHead(code, 'OK', exports.headers);
+    archive.readFile(asset, (data) => {res.end(data)})
+  }
+      
+
   
-  callback((err,asset) => {
-    if (err) {
-      res.writeHead(404, 'File Not Found', exports.headers);
-      throw err
-    }
-  });
-  archive.readFile(asset, (data) => {res.end(data)})
   // res.end(asset);
   // Write some code here that helps serve up your static files!
   // (Static files are things like html (yours or archived from others...),
