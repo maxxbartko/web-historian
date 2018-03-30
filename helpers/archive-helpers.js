@@ -13,7 +13,8 @@ exports.paths = {
   siteAssets: path.join(__dirname, '../web/public'),
   archivedSites: path.join(__dirname, '../archives/sites'),
   list: path.join(__dirname, '../archives/sites.txt'),
-  index: path.join(__dirname, '../web/public/index.html')
+  index: path.join(__dirname, '../web/public/index.html'),
+  loading: path.join(__dirname, '../web/public/loading.html')
 };
 
 // Used for stubbing paths for tests, do not modify
@@ -29,7 +30,7 @@ exports.initialize = function(pathsObj) {
 exports.readFile = function(path, callback) {
   fs.readFile(path, (err, data) => {
     if (err) throw err;
-    return callback(data);
+    callback(data);
   });
 }
 // archive.readFile(index, (data) => { res.end(data) })
@@ -50,17 +51,21 @@ exports.isUrlInList = function(url, callback) { // boolean? in my async?
 exports.addUrlToList = function(url, callback) {
   if (!exports.isUrlInList(url,(data) => {return data})){
     exports.readListOfUrls((urls) => {
-      urls.push(url);
-      // console.log(urls)
-      let urlsList = urls.join('/n');
-      // console.log(urlsList)
-      callback(fs.writeFile(exports.paths.list, urlsList));
+      urls = urls.join('\n') + url + '\n';
+      callback(fs.writeFile(exports.paths.list, urls));
     })  
   }
 };
 
 exports.isUrlArchived = function(url, callback) {
+  fs.readdir(exports.paths.archivedSites, (err,data) => {
+    if (err) throw err;
+    callback(data.includes(url));
+  });
 };
 
 exports.downloadUrls = function(urls) {
+  urls.forEach((url) => {
+    fs.writeFile(exports.paths.archivedSites + `/${url}`)
+  })
 };
